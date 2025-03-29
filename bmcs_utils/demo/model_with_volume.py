@@ -6,6 +6,8 @@ from bmcs_utils.view import View
 import numpy as np
 import time
 import traits.api as tr
+import bmcs_utils
+bmcs_utils.ENABLE_K3D = True
 import k3d
 
 from bmcs_utils.demo.layout_model import LayoutModel

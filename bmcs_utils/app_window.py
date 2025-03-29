@@ -6,12 +6,11 @@ Application Window for as a user interface to implemented models within Jupyter
    provided by the model.
 
 '''
-
+import bmcs_utils
 import ipywidgets as ipw
 import ipytree as ipt
 import traits.api as tr
 import matplotlib.pyplot as plt
-import k3d
 from .tree_node import BMCSNode
 
 from bmcs_utils.i_model import IModel
@@ -57,22 +56,39 @@ class K3DBackend(PlotBackend):
     """Plotting backend for k3d
     """
     def __init__(self, *args, **kw):
-        super().__init__(*args,**kw)
+        if not bmcs_utils.ENABLE_K3D:
+            raise ImportError("K3DBackend is disabled. Set bmcs_utils.ENABLE_K3D = True to enable it.")
+        super().__init__(*args, **kw)
+        import k3d  # Conditional import
         self.plot_widget = ipw.Output(layout=ipw.Layout(width="100%", height="100%"))
         self.plot_fig = k3d.Plot()
-        self.plot_fig.layout = ipw.Layout(width="100%",height="100%")
-        # with self.plot_widget:
-        #     self.plot_fig.display()
+        self.plot_fig.layout = ipw.Layout(width="100%", height="100%")
+        with self.plot_widget:
+            self.plot_fig.display()
         self.plot_fig.outputs.append(self.plot_widget)
+
+
+        # super().__init__(*args,**kw)
+        # self.plot_widget = ipw.Output(layout=ipw.Layout(width="100%", height="100%"))
+        # self.plot_fig = k3d.Plot()
+        # self.plot_fig.layout = ipw.Layout(width="100%",height="100%")
+        # # with self.plot_widget:
+        # #     self.plot_fig.display()
+        # self.plot_fig.outputs.append(self.plot_widget)
         self.objects = {}
 
     def clear_fig(self):
+        for obj in self.plot_fig.objects:
+            self.plot_fig -= obj
         self.objects = {}
-        # while self.plot_fig.objects:
-        #     self.plot_fig -= self.plot_fig.objects[-1]
 
-        self.plot_fig.objects = []
-        self.plot_fig.object_ids = []
+    # def clear_fig(self):
+    #     self.objects = {}
+    #     # while self.plot_fig.objects:
+    #     #     self.plot_fig -= self.plot_fig.objects[-1]
+
+    #     self.plot_fig.objects = []
+    #     self.plot_fig.object_ids = []
 
     def clear_object(self, object_key):
         obj = self.objects[object_key]
@@ -107,7 +123,13 @@ class AppWindow(tr.HasTraits):
 
     plot_backend_table = tr.Dict
     def _plot_backend_table_default(self):
-        return{'mpl': MPLBackend(), 'k3d': K3DBackend()}
+        backends = {'mpl': MPLBackend()}
+        if bmcs_utils.ENABLE_K3D:
+            backends['k3d'] = K3DBackend()
+        return backends
+
+    # def _plot_backend_table_default(self):
+    #     return{'mpl': MPLBackend(), 'k3d': K3DBackend()}
 
     # Shared layouts -
     left_pane_layout = tr.Instance(ipw.Layout)
