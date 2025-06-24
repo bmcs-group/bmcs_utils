@@ -8,7 +8,7 @@ http://www.songho.ca/opengl/gl_cylinder.html#pipe
 for reference
 """
 import numpy as np
-import k3d
+# k3d will be imported when needed
 
 
 class Extruder:
@@ -119,6 +119,7 @@ class Extruder:
         return np.array(Q2_contour)
 
     def show_in_k3d(self, scale=1):
+        import k3d  # Lazy import
         plot = k3d.plot(name='points')
         plt_points = k3d.points(positions=self.path_points, point_size=scale * 5)
         plt_points.color = 0xff0000
@@ -131,6 +132,7 @@ class Extruder:
         plot.display()
 
     def show_in_k3d_as_surface(self, with_ends=True):
+        import k3d  # Lazy import
         plot = k3d.plot(name='points')
         vertices, indices = self.get_triangulation_vertices_and_indices(with_ends=with_ends)
         mesh = k3d.mesh(vertices, indices,

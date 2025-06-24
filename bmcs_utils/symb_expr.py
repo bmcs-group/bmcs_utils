@@ -4,7 +4,6 @@ the transition from the development phase using symbolic expressions
 and executable Python classes.
 '''
 
-import sympy as sp
 from collections.abc import Iterable
 import traits.api as tr
 
@@ -69,6 +68,7 @@ class SymbExpr(tr.HasStrictTraits):
             )
             expr = getattr(self, expr_name)
             # print('defining', expr_name, ':', symbols+param_symbols)
+            import sympy as sp
             callable = sp.lambdify(symbols+param_symbols, expr, 'numpy',
                                    cse=self.cse)
             def define_callable(callable):

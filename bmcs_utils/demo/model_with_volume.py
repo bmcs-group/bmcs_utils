@@ -40,7 +40,7 @@ class ModelWithVolume(Model):
             [0,1,1],#6
             [1,1,1],#7
             ],
-            dtype=np.float_
+            dtype=np.float32
         )
         self.I_Fi = np.array([
             [0,1,2],

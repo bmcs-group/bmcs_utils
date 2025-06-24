@@ -6,11 +6,11 @@ Application Window for as a user interface to implemented models within Jupyter
    provided by the model.
 
 '''
-import bmcs_utils
+from . import ENABLE_K3D
 import ipywidgets as ipw
 import ipytree as ipt
 import traits.api as tr
-import matplotlib.pyplot as plt
+# matplotlib.pyplot will be imported lazily when needed
 from .tree_node import BMCSNode
 
 from bmcs_utils.i_model import IModel
@@ -26,6 +26,9 @@ class MPLBackend(PlotBackend):
     """
     def __init__(self, *args, **kw):
         super().__init__(*args,**kw)
+
+        # Lazy import matplotlib when backend is actually used
+        import matplotlib.pyplot as plt
 
         # To prevent additional figure from showing in Jupyter when creating figure the first time with plt.figure
         plt.ioff()
@@ -56,8 +59,8 @@ class K3DBackend(PlotBackend):
     """Plotting backend for k3d
     """
     def __init__(self, *args, **kw):
-        if not bmcs_utils.ENABLE_K3D:
-            raise ImportError("K3DBackend is disabled. Set bmcs_utils.ENABLE_K3D = True to enable it.")
+        if not ENABLE_K3D:
+            raise ImportError("K3DBackend is disabled. Set ENABLE_K3D = True to enable it.")
         super().__init__(*args, **kw)
         import k3d  # Conditional import
         self.plot_widget = ipw.Output(layout=ipw.Layout(width="100%", height="100%"))
@@ -124,9 +127,18 @@ class AppWindow(tr.HasTraits):
     plot_backend_table = tr.Dict
     def _plot_backend_table_default(self):
         backends = {'mpl': MPLBackend()}
-        if bmcs_utils.ENABLE_K3D:
-            backends['k3d'] = K3DBackend()
+        # Note: K3DBackend will be added lazily when first accessed
         return backends
+
+    def _get_k3d_backend(self):
+        """Lazily create K3D backend when first accessed"""
+        if ENABLE_K3D and 'k3d' not in self.plot_backend_table:
+            try:
+                self.plot_backend_table['k3d'] = K3DBackend()
+            except ImportError:
+                # K3D not available, keep it disabled
+                pass
+        return self.plot_backend_table.get('k3d', None)
 
     # def _plot_backend_table_default(self):
     #     return{'mpl': MPLBackend(), 'k3d': K3DBackend()}
@@ -280,23 +292,35 @@ class AppWindow(tr.HasTraits):
     pb = tr.Property()
     def _get_pb(self):
         '''Get the current plot backend'''
+        # Lazy load K3D backend if needed
+        if self.current_plot_backend == 'k3d' and 'k3d' not in self.plot_backend_table:
+            self._get_k3d_backend()
         return self.plot_backend_table[self.current_plot_backend]
 
     def set_plot_backend(self, backend):
         if self.current_plot_backend == backend:
             return
         self.current_plot_backend = backend
+        # Lazy load K3D backend if needed
+        if backend == 'k3d' and 'k3d' not in self.plot_backend_table:
+            self._get_k3d_backend()
         pb = self.plot_backend_table[backend]
         self.plot_pane.children = [pb.plot_widget]
 
     def setup_plot(self, model):
         # TODO: This is being called each time when a model tap in the tree is clicked (node clicked),
         #  is that the desired behaviour?
+        # Lazy load K3D backend if needed
+        if self.current_plot_backend == 'k3d' and 'k3d' not in self.plot_backend_table:
+            self._get_k3d_backend()
         pb = self.plot_backend_table[self.current_plot_backend]
         pb.clear_fig()
         pb.setup_plot(model)
 
     def update_plot(self, model):
+        # Lazy load K3D backend if needed
+        if self.current_plot_backend == 'k3d' and 'k3d' not in self.plot_backend_table:
+            self._get_k3d_backend()
         pb = self.plot_backend_table[self.current_plot_backend]
         pb.update_plot(model)
         pb.show_fig()

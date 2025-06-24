@@ -1,6 +1,5 @@
 
 import traits.api as tr
-from bmcs_utils.app_window import AppWindow
 from bmcs_utils.view import View
 from bmcs_utils.i_model import IModel
 from .controller import Controller
@@ -41,6 +40,7 @@ class Model(ModelNotifyMixin, ModelTreeNodeMixin):
         pass
 
     def new_app_window(self, **kw):
+        from bmcs_utils.app_window import AppWindow
         return AppWindow(self, **kw)
 
     def interact(self,**kw):

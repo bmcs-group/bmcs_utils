@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from .model import Model
 import os
 
@@ -39,6 +38,7 @@ class ParametricStudy(Model):
                 print('')
         if log:
             print('Parametric study finished.')
+        import matplotlib.pyplot as plt
         plt.show()
         self.fig = fig
         if savefig:
@@ -46,6 +46,7 @@ class ParametricStudy(Model):
         return fig
 
     def _get_axes(self, params_config):
+        import matplotlib.pyplot as plt
         params_num = len(params_config)
         nrows = int(params_num / 3)
         if params_num % 3 != 0:

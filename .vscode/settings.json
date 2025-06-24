@@ -1,0 +1,34 @@
+{
+    // Pylance configuration for relaxed typing
+    "python.analysis.typeCheckingMode": "off",
+    
+    // Alternative: Use "basic" for minimal type checking
+    // "python.analysis.typeCheckingMode": "basic",
+    
+    // Keep auto-imports and IntelliSense
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.completeFunctionParens": true,
+    
+    // Disable specific type-related diagnostics
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingTypeStubs": "none",
+        "reportUnknownParameterType": "none",
+        "reportUnknownArgumentType": "none",
+        "reportUnknownLambdaType": "none",
+        "reportUnknownVariableType": "none",
+        "reportUnknownMemberType": "none",
+        "reportMissingParameterType": "none",
+        "reportMissingReturnType": "none",
+        "reportUntypedFunctionDecorator": "none",
+        "reportUntypedClassDecorator": "none",
+        "reportUntypedBaseClass": "none",
+        "reportUntypedNamedTuple": "none",
+        "reportPrivateUsage": "none",
+        "reportConstantRedefinition": "none"
+    },
+    
+    // Keep useful features
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.stubPath": "./typings"
+}

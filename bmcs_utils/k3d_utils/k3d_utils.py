@@ -1,4 +1,5 @@
-import bmcs_utils.api as bu
+# Use direct imports:
+from .extrusion_for_3d_curve import Extruder
 import k3d
 
 class K3DUtils:
@@ -7,9 +8,9 @@ class K3DUtils:
     def add_circle(k3d_plot, path, r, wireframe=False):
         n = 100
         #   path = np.array([[-4000, 0, -4000], [4000, 0, -4000]])
-        first_contour = bu.Extruder.get_circle_points(r=r, n=n)[int(n / 2):, :]
+        first_contour = Extruder.get_circle_points(r=r, n=n)[int(n / 2):, :]
 
-        extruder = bu.Extruder(first_contour, path)
+        extruder = Extruder(first_contour, path)
         vertices, indices = extruder.get_triangulation_vertices_and_indices(with_ends=False)
 
         # extruder.show_in_k3d_as_surface(with_ends=False)
