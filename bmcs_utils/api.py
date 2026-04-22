@@ -22,8 +22,16 @@ from bmcs_utils.misc.plot_tools import plot_colors, set_latex_mpl_format
 from bmcs_utils.parametric_study import ParametricStudy
 from bmcs_utils.data_cache import data_cache
 
+# In api.py, replace direct imports with lazy loading:
 if bmcs_utils.ENABLE_K3D:
-    from bmcs_utils.k3d_utils.extrusion_for_3d_curve import Extruder
-    from bmcs_utils.k3d_utils.k3d_utils import K3DUtils
-
+    def _import_k3d():
+        try:
+            from bmcs_utils.k3d_utils.extrusion_for_3d_curve import Extruder
+            from bmcs_utils.k3d_utils.k3d_utils import K3DUtils
+            return Extruder, K3DUtils
+        except ImportError:
+            return None, None
+    
+    Extruder, K3DUtils = _import_k3d()
+    
 from bmcs_utils.symbol.cymbol import Cymbol, cymbols, ccode
